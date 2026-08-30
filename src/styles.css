@@ -1,0 +1,156 @@
+@import "@fontsource-variable/inter/wght.css";
+@import "@fontsource-variable/fraunces/standard.css";
+@import "tailwindcss" source(none);
+@source "../src";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-3xl: calc(var(--radius) + 12px);
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-ring-offset-background: var(--background);
+  --color-navy: var(--navy);
+  --color-navy-foreground: var(--navy-foreground);
+  --color-teal: var(--teal);
+  --color-sand: var(--sand);
+  --color-gold: var(--gold);
+
+  --font-sans: "Inter Variable", "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Fraunces Variable", "Fraunces", "Playfair Display", ui-serif, Georgia, serif;
+
+  --shadow-elegant: 0 20px 60px -20px color-mix(in oklab, var(--navy) 35%, transparent);
+  --shadow-card: 0 10px 30px -12px color-mix(in oklab, var(--navy) 18%, transparent);
+  --gradient-hero: linear-gradient(135deg, color-mix(in oklab, var(--navy) 92%, black) 0%, var(--navy) 60%, var(--teal) 100%);
+  --gradient-subtle: linear-gradient(180deg, oklch(0.99 0.005 80) 0%, oklch(0.965 0.008 80) 100%);
+}
+
+:root {
+  --radius: 0.75rem;
+
+  /* Warm off-white background, deep navy foreground */
+  --background: oklch(0.99 0.006 85);
+  --foreground: oklch(0.22 0.04 250);
+
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.22 0.04 250);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.22 0.04 250);
+
+  /* Deep navy — brand primary (#0D3B66-ish) */
+  --primary: oklch(0.32 0.09 250);
+  --primary-foreground: oklch(0.99 0.006 85);
+
+  --secondary: oklch(0.96 0.008 85);
+  --secondary-foreground: oklch(0.22 0.04 250);
+
+  --muted: oklch(0.955 0.008 85);
+  --muted-foreground: oklch(0.48 0.02 250);
+
+  --accent: oklch(0.94 0.02 220);
+  --accent-foreground: oklch(0.22 0.04 250);
+
+  --destructive: oklch(0.577 0.245 27.325);
+  --destructive-foreground: oklch(0.99 0.006 85);
+
+  --border: oklch(0.9 0.012 85);
+  --input: oklch(0.9 0.012 85);
+  --ring: oklch(0.42 0.11 235);
+
+  /* Brand accents */
+  --navy: oklch(0.32 0.09 250);
+  --navy-foreground: oklch(0.99 0.006 85);
+  --teal: oklch(0.5 0.08 210);
+  --sand: oklch(0.92 0.03 80);
+  --gold: oklch(0.75 0.13 75);
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+  html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 5rem;
+  }
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+  h1, h2, h3, h4 {
+    font-family: var(--font-display);
+    letter-spacing: -0.02em;
+    font-weight: 600;
+    /* Fraunces "standard" build: optical sizing auto-scales with font-size,
+       keeping letterforms (incl. the "f") crisp and straight at display sizes */
+    font-optical-sizing: auto;
+  }
+  .font-display,
+  [class*="font-display"] {
+    font-family: var(--font-display);
+    font-optical-sizing: auto;
+  }
+}
+
+@utility container-x {
+  padding-inline: 1.25rem;
+  @media (min-width: 768px) {
+    padding-inline: 2rem;
+  }
+  margin-inline: auto;
+  max-width: 80rem;
+}
+
+@utility text-balance {
+  text-wrap: balance;
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@utility animate-fade-up {
+  animation: fadeUp 0.7s ease-out both;
+}
+
+/* Skip rendering work for offscreen sections until they scroll into view */
+@utility cv-auto {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 700px;
+}
+
+/* Light gray woven-cloth texture (pure CSS — zero image weight) */
+@utility cloth-gray {
+  background-color: oklch(0.9 0.003 90);
+  background-image:
+    repeating-linear-gradient(90deg, rgba(255,255,255,0.55) 0 1px, transparent 1px 3px),
+    repeating-linear-gradient(0deg, rgba(0,0,0,0.045) 0 1px, transparent 1px 3px),
+    repeating-linear-gradient(45deg, rgba(0,0,0,0.02) 0 2px, transparent 2px 4px);
+}
