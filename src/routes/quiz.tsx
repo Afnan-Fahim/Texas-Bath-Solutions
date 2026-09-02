@@ -13,7 +13,6 @@ function QuizPage() {
   const [calendlyCompleted, setCalendlyCompleted] = useState(false);
   const [showCalendly, setShowCalendly] = useState(false);
   const [quizData, setQuizData] = useState<QuizState | null>(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleShowCalendly = (data: QuizState) => {
     setQuizData(data);
@@ -22,7 +21,7 @@ function QuizPage() {
 
   const handleCalendlyScheduled = () => {
     setCalendlyCompleted(true);
-    setShowCalendly(false); // Go back to quiz flow for step 4 (final lead form)
+    setShowCalendly(false); // Go back to quiz flow for final lead form (step 5)
   };
 
   const handleCalendlyBack = () => {
@@ -30,17 +29,16 @@ function QuizPage() {
   };
 
   const handleQuizComplete = async (finalData: QuizState) => {
-    setIsSubmitting(true);
     try {
       const notes = [
         `Homeowner: ${finalData.homeowner}`,
         `Upgrade: ${finalData.desiredUpgrade}`,
         `Problem: ${finalData.mainProblem}`
-      ].join('\\n');
+      ].join('\n');
 
       const leadData = {
-        name: "Provided in Calendly", // Fake name for zod, real name is in Calendly
-        email: "calendly@provided.com", // Fake email for zod
+        name: "Provided in Calendly", // We don't ask for name anymore in step 5
+        email: "calendly@provided.com",
         phone: finalData.phone,
         address: finalData.address,
         timeframe: finalData.timeline,
@@ -48,16 +46,16 @@ function QuizPage() {
         source: "Facebook/Messenger Quiz",
       };
 
+      // Save the lead to the database
       await submitLead({ data: leadData });
       trackLeadEvent(`quiz:${finalData.phone}`, { phone: finalData.phone });
 
-      alert("Thank you! Your submission is complete.");
+      alert("Thank you! Your visit is confirmed.");
       window.location.href = "/";
     } catch (e) {
       console.error(e);
-      alert("Failed to submit lead. Please try again.");
-    } finally {
-      setIsSubmitting(false);
+      alert("Failed to submit. Please try again.");
+      throw e;
     }
   };
 

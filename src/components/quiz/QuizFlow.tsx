@@ -1,10 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { QuizCard } from "./QuizCard";
 import { supabase } from "@/integrations/supabase/client";
-import { useEffect } from "react";
 
 export type QuizState = {
   desiredUpgrade: string;
@@ -47,20 +46,20 @@ const QUIZ_DATA = {
 };
 
 interface QuizFlowProps {
-  onComplete: (data: QuizState) => void;
+  onComplete: (data: QuizState) => Promise<void>;
   onShowCalendly: (data: QuizState) => void;
   calendlyCompleted: boolean;
 }
 
 export function QuizFlow({ onComplete, onShowCalendly, calendlyCompleted }: QuizFlowProps) {
   const [step, setStep] = useState(1);
-  const [quizData, setQuizData] = useState<any>(QUIZ_DATA); // Fallback to static
+  const [quizData, setQuizData] = useState<any>(QUIZ_DATA);
   const [isLoadingQuiz, setIsLoadingQuiz] = useState(true);
 
   useEffect(() => {
     const fetchQuiz = async () => {
       try {
-        const { data, error } = await supabase
+        const { data } = await supabase
           .from("quiz_settings")
           .select("quiz_data")
           .eq("id", 1)
@@ -89,7 +88,6 @@ export function QuizFlow({ onComplete, onShowCalendly, calendlyCompleted }: Quiz
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
 
-  // Step 4 is the final lead capture form (after Calendly)
   const currentStep = calendlyCompleted ? 4 : step;
 
   const handleNext = () => setStep((s) => s + 1);
@@ -101,7 +99,6 @@ export function QuizFlow({ onComplete, onShowCalendly, calendlyCompleted }: Quiz
 
   const handleOptionSelect = (key: keyof QuizState, value: string) => {
     updateState(key, value);
-    // Auto-advance for questions
     setTimeout(() => {
       if (key === "timeline") {
         onShowCalendly({ ...state, timeline: value });
@@ -146,7 +143,7 @@ export function QuizFlow({ onComplete, onShowCalendly, calendlyCompleted }: Quiz
           <span className="text-sm font-medium text-muted-foreground">
             Step {currentStep} of 3
           </span>
-          <div className="w-12"></div> {/* Spacer for balance */}
+          <div className="w-12"></div>
         </div>
       )}
 
@@ -217,20 +214,21 @@ export function QuizFlow({ onComplete, onShowCalendly, calendlyCompleted }: Quiz
       {/* FINAL CAPTURE FORM (After Calendly) */}
       {currentStep === 4 && (
         <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-          <div className="text-center mb-8">
-            <h2 className="text-2xl sm:text-3xl font-bold text-foreground mb-2">Just a few more details</h2>
-            <p className="text-muted-foreground">We need this to finalize your estimate.</p>
+          <div className="mb-8">
+            <h2 className="text-3xl sm:text-4xl font-bold text-navy mb-2 leading-tight">You're all set —<br />just confirm the visit.</h2>
+            <p className="text-muted-foreground text-base mt-4">Free estimate at your house from a local Texas company. No pressure. We just need a phone and address so we can show up.</p>
           </div>
           
-          <form onSubmit={handleSubmit} className="space-y-6 max-w-md mx-auto text-left">
+          <form onSubmit={handleSubmit} className="space-y-6 mx-auto text-left">
             {error && <div className="p-3 text-sm text-destructive-foreground bg-destructive/10 rounded-md">{error}</div>}
             
             <div className="space-y-2">
-              <Label htmlFor="quiz-phone">Phone Number</Label>
+              <Label htmlFor="quiz-phone" className="text-base font-semibold text-navy">Mobile phone *</Label>
               <Input
                 id="quiz-phone"
                 type="tel"
-                placeholder="(555) 555-5555"
+                placeholder="(   ) ___-____"
+                className="h-12 text-base"
                 value={state.phone}
                 onChange={(e) => updateState("phone", e.target.value)}
                 required
@@ -238,49 +236,54 @@ export function QuizFlow({ onComplete, onShowCalendly, calendlyCompleted }: Quiz
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="quiz-address">Address / Zip Code</Label>
+              <Label htmlFor="quiz-address" className="text-base font-semibold text-navy">Street address *</Label>
               <Input
                 id="quiz-address"
                 type="text"
-                placeholder="123 Main St..."
+                placeholder="123 Main St, Apt # or Unit"
+                className="h-12 text-base"
                 value={state.address}
                 onChange={(e) => updateState("address", e.target.value)}
                 required
               />
             </div>
 
-            <div className="space-y-3 pt-2">
-              <Label>Are you the homeowner?</Label>
-              <div className="flex gap-6 mt-2">
-                <label className="flex items-center space-x-2 cursor-pointer">
+            <div className="space-y-4 pt-2">
+              <Label className="text-base font-semibold text-navy">Are you the homeowner?</Label>
+              <div className="flex gap-8">
+                <label className="flex items-center space-x-3 cursor-pointer group">
+                  <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${state.homeowner === "Yes" ? "border-navy" : "border-border group-hover:border-navy"}`}>
+                    {state.homeowner === "Yes" && <div className="w-3 h-3 bg-navy rounded-full" />}
+                  </div>
                   <input 
                     type="radio" 
                     name="homeowner" 
                     value="Yes"
-                    checked={state.homeowner === "Yes"}
+                    className="hidden"
                     onChange={(e) => updateState("homeowner", e.target.value)}
-                    className="w-4 h-4 text-primary"
                     required
                   />
-                  <span className="text-base font-medium">Yes</span>
+                  <span className="text-lg text-foreground">Yes</span>
                 </label>
-                <label className="flex items-center space-x-2 cursor-pointer">
+                <label className="flex items-center space-x-3 cursor-pointer group">
+                  <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${state.homeowner === "No" ? "border-navy" : "border-border group-hover:border-navy"}`}>
+                    {state.homeowner === "No" && <div className="w-3 h-3 bg-navy rounded-full" />}
+                  </div>
                   <input 
                     type="radio" 
                     name="homeowner" 
                     value="No"
-                    checked={state.homeowner === "No"}
+                    className="hidden"
                     onChange={(e) => updateState("homeowner", e.target.value)}
-                    className="w-4 h-4 text-primary"
                     required
                   />
-                  <span className="text-base font-medium">No</span>
+                  <span className="text-lg text-foreground">No.</span>
                 </label>
               </div>
             </div>
 
-            <Button type="submit" size="lg" className="w-full mt-4" disabled={submitting}>
-              {submitting ? "Submitting..." : "Complete Submission"}
+            <Button type="submit" size="lg" className="w-full h-14 text-lg bg-[#0d2240] hover:bg-[#0d2240]/90 text-white mt-8" disabled={submitting}>
+              {submitting ? "Confirming..." : "Confirm my visit"}
             </Button>
           </form>
         </div>
