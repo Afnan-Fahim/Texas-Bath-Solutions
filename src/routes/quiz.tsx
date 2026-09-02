@@ -69,30 +69,28 @@ function QuizPage() {
         </a>
       </header>
 
-      <main className="flex-1 w-full flex flex-col justify-center py-12 px-4 sm:px-6">
-        {!showCalendly ? (
+      <main className="flex-1 w-full flex flex-col justify-center py-12 px-4 sm:px-6 relative">
+        <div className={showCalendly ? "hidden" : "block w-full"}>
           <QuizFlow
             onShowCalendly={handleShowCalendly}
             onComplete={handleQuizComplete}
             calendlyCompleted={calendlyCompleted}
           />
-        ) : (
-          <div className="w-full max-w-3xl mx-auto bg-background p-6 rounded-2xl shadow-sm border border-border">
-            <CalendlyEmbed
-              prefill={{
-                name: "",
-                email: "",
-                phone: quizData?.phone || "",
-                project: quizData?.timeline,
-                notes: `Upgrade: ${quizData?.desiredUpgrade}, Problem: ${quizData?.mainProblem}`,
-              }}
-              onBack={handleCalendlyBack}
-              onScheduled={handleCalendlyScheduled}
-              title="Pick a time for your free estimate"
-              subtitle="Lock in your appointment to discuss your project."
-            />
-          </div>
-        )}
+        </div>
+
+        <div className={showCalendly ? "block w-full max-w-3xl mx-auto bg-background p-6 rounded-2xl shadow-sm border border-border" : "hidden"}>
+          <CalendlyEmbed
+            prefill={{
+              name: "",
+              email: "",
+              phone: "",
+            }}
+            onBack={handleCalendlyBack}
+            onScheduled={handleCalendlyScheduled}
+            title="Pick a time for your free estimate"
+            subtitle="Lock in your appointment to discuss your project."
+          />
+        </div>
       </main>
     </div>
   );

@@ -23,11 +23,16 @@ export function QuizCard({ title, description, image, selected, onClick }: QuizC
       )}
     >
       {image ? (
-        <div className="w-full aspect-video bg-muted relative">
+        <div className="w-full aspect-square bg-muted/30 relative overflow-hidden flex items-center justify-center p-3">
+          {/* Premium blurred background effect */}
+          <div 
+            className="absolute inset-0 blur-2xl opacity-50 bg-cover bg-center scale-110" 
+            style={{ backgroundImage: `url(${image})` }} 
+          />
           <img
             src={image}
             alt={title}
-            className="absolute inset-0 w-full h-full object-cover"
+            className="relative w-full h-full object-contain rounded-md drop-shadow-md z-10"
             loading="lazy"
             onError={(e) => {
               // Fallback if image fails to load
@@ -37,7 +42,7 @@ export function QuizCard({ title, description, image, selected, onClick }: QuizC
         </div>
       ) : (
         // Placeholder if no image provided
-        <div className="w-full aspect-video bg-muted flex items-center justify-center">
+        <div className="w-full aspect-square bg-muted flex items-center justify-center">
           <span className="text-muted-foreground text-sm">Image Pending</span>
         </div>
       )}
