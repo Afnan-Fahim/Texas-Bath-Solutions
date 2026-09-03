@@ -27,8 +27,6 @@ import {
 import logoImg from "@/assets/logo-header.webp";
 import logoFooterImg from "@/assets/logo-footer.webp";
 
-import heroVideoAsset from "@/assets/texas-bath-solutions-hero.mp4.asset.json";
-import heroVideoWideAsset from "@/assets/texas-bath-solutions-hero-wide.mp4.asset.json";
 import heroPoster from "@/assets/hero-video-poster.avif";
 
 import { Button } from "@/components/ui/button";
@@ -878,11 +876,12 @@ function HeroVideo() {
         ref={videoRef}
         key={wide ? "wide" : "portrait"}
         className="block h-auto w-full"
-        src={srcReady ? (wide ? heroVideoWideAsset.url : heroVideoAsset.url) : undefined}
+        src={srcReady ? "/texas-bath-solutions-hero.mp4" : undefined}
         poster={wide ? undefined : heroPoster}
         width={wide ? 1880 : 720}
         height={wide ? 1080 : 1280}
         autoPlay
+        muted={muted}
         playsInline
         controls
         preload={srcReady ? "metadata" : "none"}
