@@ -58,6 +58,7 @@ import {
 } from "@/components/ui/accordion";
 import { cn } from "@/lib/utils";
 import { LegalTerms } from "@/components/LegalTerms";
+import { QuizFlow, QuizState } from "@/components/quiz/QuizFlow";
 
 import heroShower from "@/assets/hero-shower.avif";
 import afterSubway from "@/assets/after-subway.avif";
@@ -1919,90 +1920,57 @@ function validateBookingField(k: BookingFields, v: string): string {
 }
 
 function BookingForm({ formRef }: { formRef: React.RefObject<HTMLElement | null> }) {
-  const [state, setState] = useState({
-    name: "",
-    phone: "",
-    email: "",
-    address: "",
-    project: "",
-    notes: "",
-  });
-  const [errors, setErrors] = useState<Record<string, string>>({});
-  const [submitting, setSubmitting] = useState(false);
-  const [step, setStep] = useState<"form" | "schedule" | "done">("form");
+  const [calendlyCompleted, setCalendlyCompleted] = useState(false);
+  const [showCalendly, setShowCalendly] = useState(false);
+  const [quizData, setQuizData] = useState<QuizState | null>(null);
 
   useEffect(() => {
     captureAttribution();
   }, []);
 
-  const update = <K extends keyof typeof state>(k: K, v: (typeof state)[K]) => {
-    setState((s) => ({ ...s, [k]: v }));
-    setErrors((prev) => {
-      if (!prev[k]) return prev;
-      const next = { ...prev };
-      delete next[k];
-      return next;
-    });
+  const handleShowCalendly = (data: QuizState) => {
+    setQuizData(data);
+    setShowCalendly(true);
   };
 
-  const blur = (k: BookingFields) => {
-    const msg = validateBookingField(k, state[k]);
-    setErrors((prev) => {
-      const next = { ...prev };
-      if (msg) next[k] = msg;
-      else delete next[k];
-      return next;
-    });
-  };
-
-  const validate = () => {
-    const fields: BookingFields[] = ["name", "phone", "email", "address", "project"];
-    const e: Record<string, string> = {};
-    for (const f of fields) {
-      const msg = validateBookingField(f, state[f]);
-      if (msg) e[f] = msg;
-    }
-    setErrors(e);
-    const first = fields.find((f) => e[f]);
-    if (first) {
-      requestAnimationFrame(() => {
-        const el = document.getElementById(`book-${first}`);
-        el?.scrollIntoView({ behavior: "smooth", block: "center" });
-        el?.focus({ preventScroll: true });
-      });
-    }
-    return Object.keys(e).length === 0;
-  };
-
-  const submit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (submitting) return;
-    if (!validate()) return;
-    setSubmitting(true);
-    void submitLead({
-      data: {
-        name: state.name,
-        phone: state.phone,
-        email: state.email,
-        address: state.address,
-        timeframe: state.project,
-        notes: state.notes + attributionNote(),
-        source: "Website booking form",
-      },
-    })
-      .catch((err: unknown) => console.error("Lead notification failed", err))
-      .finally(() => setSubmitting(false));
-    setStep("schedule");
+  const handleCalendlyScheduled = () => {
+    setCalendlyCompleted(true);
+    setShowCalendly(false);
     requestAnimationFrame(() => formRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }));
   };
 
-  const reset = () => {
-    setStep("form");
-    setErrors({});
-    setState({ name: "", phone: "", email: "", address: "", project: "", notes: "" });
+  const handleCalendlyBack = () => {
+    setShowCalendly(false);
   };
 
-  const stepIndex = step === "form" ? 0 : step === "schedule" ? 1 : 2;
+  const handleQuizComplete = async (finalData: QuizState) => {
+    try {
+      const notes = [
+        `Homeowner: ${finalData.homeowner}`,
+        `Upgrade: ${finalData.desiredUpgrade}`,
+        `Problem: ${finalData.mainProblem}`
+      ].join('\n') + attributionNote();
+
+      const leadData = {
+        name: "Provided in Calendly", 
+        email: "calendly@provided.com",
+        phone: finalData.phone,
+        address: finalData.address,
+        timeframe: finalData.timeline,
+        notes: notes,
+        source: "Website quiz form",
+      };
+
+      await submitLead({ data: leadData });
+      trackLeadEvent(`quiz:${finalData.phone}`, { phone: finalData.phone });
+
+      alert("Thank you! Your visit is confirmed.");
+      window.location.reload();
+    } catch (e) {
+      console.error(e);
+      alert("Failed to submit. Please try again.");
+    }
+  };
 
   return (
     <section
@@ -2010,7 +1978,6 @@ function BookingForm({ formRef }: { formRef: React.RefObject<HTMLElement | null>
       ref={formRef as React.RefObject<HTMLElement>}
       className="scroll-mt-24 py-12 md:py-16 bg-gradient-to-b from-background to-secondary/60"
     >
-
       <div className="container-x grid gap-10 lg:grid-cols-5 items-start">
         <div className="lg:col-span-2 lg:sticky lg:top-28">
           <span className="inline-flex items-center gap-2 rounded-full bg-navy/5 px-3 py-1 text-xs font-semibold normal-case tracking-wide text-navy">
@@ -2022,7 +1989,6 @@ function BookingForm({ formRef }: { formRef: React.RefObject<HTMLElement | null>
           <p className="mt-5 text-lg text-muted-foreground">
             Tell us about your project, then pick the exact time that works for you.
           </p>
-
           <ul className="mt-6 space-y-3">
             {[
               "No pressure. No obligation.",
@@ -2041,163 +2007,28 @@ function BookingForm({ formRef }: { formRef: React.RefObject<HTMLElement | null>
             ))}
           </ul>
         </div>
-
         <div className="lg:col-span-3">
-          <div className="rounded-3xl bg-card border border-border shadow-elegant p-6 md:p-8">
-            <ol className="mb-6 flex items-center gap-2" aria-label="Booking progress">
-              {["Your details", "Pick a time", "Confirmed"].map((label, i) => (
-                <li key={label} className="flex flex-1 items-center gap-2 min-w-0">
-                  <span
-                    aria-current={i === stepIndex ? "step" : undefined}
-                    className={`grid h-6 w-6 shrink-0 place-items-center rounded-full text-xs font-semibold ${
-                      i <= stepIndex
-                        ? "bg-navy text-navy-foreground"
-                        : "bg-secondary text-muted-foreground"
-                    }`}
-                  >
-                    {i < stepIndex ? <Check className="h-3 w-3" strokeWidth={3} /> : i + 1}
-                  </span>
-                  <span
-                    className={`truncate text-xs font-medium ${
-                      i <= stepIndex ? "text-navy" : "text-muted-foreground"
-                    }`}
-                  >
-                    {label}
-                  </span>
-                </li>
-              ))}
-            </ol>
-            {step === "done" ? (
-              <ConfirmationScreen state={state} onReset={reset} />
-            ) : step === "schedule" ? (
-              <CalendlyEmbed
-                prefill={state}
-                onBack={() => setStep("form")}
-                onScheduled={() => setStep("done")}
-              />
-            ) : (
-
-              <form onSubmit={submit} className="space-y-5" noValidate>
-                <div className="grid gap-5 sm:grid-cols-2">
-                  <Field label="Full Name" error={errors.name} required htmlFor="book-name">
-                    <Input
-                      id="book-name"
-                      className="h-12 text-base"
-                      value={state.name}
-                      onChange={(e) => update("name", e.target.value)}
-                      onBlur={() => blur("name")}
-                      placeholder="Your Name"
-                      autoComplete="name"
-                      aria-invalid={!!errors.name}
-                      aria-describedby={errors.name ? "book-name-error" : undefined}
-                    />
-                  </Field>
-                  <Field label="Phone Number" error={errors.phone} required htmlFor="book-phone">
-                    <Input
-                      id="book-phone"
-                      className="h-12 text-base"
-                      value={state.phone}
-                      onChange={(e) => update("phone", formatPhone(e.target.value))}
-                      onBlur={() => blur("phone")}
-                      placeholder="(210) 555-0123"
-                      inputMode="tel"
-                      autoComplete="tel"
-                      aria-invalid={!!errors.phone}
-                      aria-describedby={errors.phone ? "book-phone-error" : undefined}
-                    />
-                  </Field>
-                </div>
-                <div className="grid gap-5 sm:grid-cols-2">
-                  <Field label="Email" error={errors.email} required htmlFor="book-email">
-                    <Input
-                      id="book-email"
-                      className="h-12 text-base"
-                      type="email"
-                      value={state.email}
-                      onChange={(e) => update("email", e.target.value)}
-                      onBlur={() => blur("email")}
-                      placeholder="Your Email"
-                      inputMode="email"
-                      autoComplete="email"
-                      aria-invalid={!!errors.email}
-                      aria-describedby={errors.email ? "book-email-error" : undefined}
-                    />
-                  </Field>
-                  <Field label="Address" error={errors.address} required htmlFor="book-address">
-                    <Input
-                      id="book-address"
-                      className="h-12 text-base"
-                      value={state.address}
-                      onChange={(e) => update("address", e.target.value)}
-                      onBlur={() => blur("address")}
-                      placeholder="123 Main St, San Antonio"
-                      autoComplete="street-address"
-                      aria-invalid={!!errors.address}
-                      aria-describedby={errors.address ? "book-address-error" : undefined}
-                    />
-                  </Field>
-                </div>
-
-                <Field
-                  label="How soon are you wanting to enjoy your New Bathroom?"
-                  error={errors.project}
-                  required
-                  htmlFor="book-project"
-                >
-                  <Select
-                    value={state.project}
-                    onValueChange={(v) => update("project", v)}
-                  >
-                    <SelectTrigger
-                      id="book-project"
-                      className="w-full h-12 text-base"
-                      aria-invalid={!!errors.project}
-                      aria-describedby={errors.project ? "book-project-error" : undefined}
-                    >
-                      <SelectValue placeholder="Select a timeframe" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {["Immediately", "Within One Month", "More than 3 Months"].map((p) => (
-                        <SelectItem key={p} value={p}>
-                          {p}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </Field>
-
-
-                <Field label="Tell us about your current bathroom (optional)">
-                  <Textarea
-                    value={state.notes}
-                    onChange={(e) => update("notes", e.target.value)}
-                    placeholder="Size, age, style you're going for, any concerns…"
-                    rows={4}
-                    className="text-base"
-                  />
-                </Field>
-
-                {Object.keys(errors).length > 0 && (
-                  <p role="alert" className="text-sm text-destructive">
-                    Please fix the highlighted {Object.keys(errors).length === 1 ? "field" : "fields"} above to continue.
-                  </p>
-                )}
-
-                <Button
-                  type="submit"
-                  size="lg"
-                  className="w-full h-12 bg-navy text-navy-foreground hover:bg-navy/90 text-base font-semibold shadow-elegant"
-                >
-                  Final Step -- Pick My Appointment Time
-                </Button>
-                <p className="text-center text-xs text-muted-foreground">
-                  Next: choose your time. Instant confirmation + automatic reminders. No obligation.
-                </p>
-              </form>
-            )}
+          <div className={showCalendly ? "hidden" : "block w-full"}>
+            <QuizFlow
+              onShowCalendly={handleShowCalendly}
+              onComplete={handleQuizComplete}
+              calendlyCompleted={calendlyCompleted}
+            />
           </div>
-
-
+          <div className={showCalendly ? "block w-full bg-card rounded-3xl shadow-elegant border border-border p-6 md:p-8" : "hidden"}>
+            <CalendlyEmbed
+              prefill={{
+                name: "",
+                email: "",
+                phone: quizData?.phone || "",
+                project: quizData?.timeline || "",
+              }}
+              onBack={handleCalendlyBack}
+              onScheduled={handleCalendlyScheduled}
+              title="Pick a time for your free estimate"
+              subtitle="Lock in your appointment to discuss your project."
+            />
+          </div>
         </div>
       </div>
     </section>
