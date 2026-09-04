@@ -134,15 +134,6 @@ export function QuizFlow({ onComplete, onShowCalendly, calendlyCompleted }: Quiz
       {/* Decorative gradient backgrounds */}
       <div className="absolute top-0 right-0 -mr-20 -mt-20 w-64 h-64 rounded-full bg-teal/10 blur-3xl opacity-50 pointer-events-none group-hover:opacity-100 transition-opacity duration-700"></div>
       <div className="absolute bottom-0 left-0 -ml-20 -mb-20 w-64 h-64 rounded-full bg-navy/5 blur-3xl opacity-50 pointer-events-none group-hover:opacity-100 transition-opacity duration-700"></div>
-      
-      {/* "Start Here" Attention Grabber for the first step */}
-      {currentStep === 1 && (
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 mt-4 z-20">
-          <span className="flex h-8 items-center justify-center rounded-full bg-teal px-4 text-xs font-bold uppercase tracking-wider text-white shadow-md animate-bounce">
-            Start Here
-          </span>
-        </div>
-      )}
 
       <div className="relative z-10 p-5 sm:p-8 md:p-10">
         {/* Progress */}

@@ -2019,16 +2019,20 @@ function BookingForm({ formRef }: { formRef: React.RefObject<HTMLElement | null>
           </ul>
         </div>
         <div className="lg:col-span-3">
-          <div className="rounded-3xl bg-card border border-border shadow-elegant p-8 md:p-12 text-center flex flex-col items-center justify-center h-full min-h-[400px]">
-            <div className="grid h-20 w-20 place-items-center rounded-full bg-teal/10 text-teal mb-6">
-              <ClipboardCheck className="h-10 w-10" />
+          <div className="rounded-3xl bg-card border border-teal/20 shadow-2xl p-8 md:p-12 text-center flex flex-col items-center justify-center h-full min-h-[400px] relative overflow-hidden group hover:shadow-[0_10px_50px_rgba(13,59,102,0.12)] transition-all duration-500">
+            {/* Background Glows */}
+            <div className="absolute top-0 right-0 -mr-20 -mt-20 w-64 h-64 rounded-full bg-teal/10 blur-3xl opacity-50 pointer-events-none group-hover:opacity-100 transition-opacity duration-700"></div>
+            <div className="absolute bottom-0 left-0 -ml-20 -mb-20 w-64 h-64 rounded-full bg-navy/5 blur-3xl opacity-50 pointer-events-none group-hover:opacity-100 transition-opacity duration-700"></div>
+            
+            <div className="relative z-10 grid h-24 w-24 place-items-center rounded-full bg-teal/10 text-teal mb-6 animate-pulse">
+              <ClipboardCheck className="h-12 w-12" />
             </div>
-            <h3 className="text-2xl md:text-3xl font-bold text-navy mb-4">Get Your Free Quote Instantly</h3>
-            <p className="text-muted-foreground mb-8 text-lg max-w-md">Answer 3 quick questions about your project to instantly lock in your appointment time.</p>
+            <h3 className="relative z-10 text-3xl md:text-4xl font-bold text-navy mb-4 leading-tight">Get Your Free Quote Instantly</h3>
+            <p className="relative z-10 text-muted-foreground mb-8 text-lg max-w-md">Answer 3 quick questions about your project to instantly lock in your appointment time.</p>
             <Button 
               onClick={() => setIsQuizOpen(true)}
               size="lg" 
-              className="w-full sm:w-auto h-14 px-8 text-lg bg-navy hover:bg-navy/90 text-white shadow-xl hover:shadow-2xl transition-all hover:scale-105"
+              className="relative z-10 w-full sm:w-auto h-16 px-10 text-xl font-semibold bg-teal hover:bg-teal/90 text-white shadow-xl hover:shadow-2xl transition-all hover:-translate-y-1 animate-[bounce_3s_infinite]"
             >
               Start My Quote Quiz
             </Button>
