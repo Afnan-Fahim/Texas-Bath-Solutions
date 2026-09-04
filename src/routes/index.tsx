@@ -1923,14 +1923,16 @@ function BookingForm({ formRef }: { formRef: React.RefObject<HTMLElement | null>
   const [calendlyCompleted, setCalendlyCompleted] = useState(false);
   const [showCalendly, setShowCalendly] = useState(false);
   const [quizData, setQuizData] = useState<QuizState | null>(null);
+  const [calendlyUrl, setCalendlyUrl] = useState("https://calendly.com/rugsafari/texas-bath-solutions");
   const [isQuizOpen, setIsQuizOpen] = useState(false);
 
   useEffect(() => {
     captureAttribution();
   }, []);
 
-  const handleShowCalendly = (data: QuizState) => {
+  const handleShowCalendly = (data: QuizState, url?: string) => {
     setQuizData(data);
+    if (url) setCalendlyUrl(url);
     setShowCalendly(true);
   };
 
@@ -2052,6 +2054,7 @@ function BookingForm({ formRef }: { formRef: React.RefObject<HTMLElement | null>
             </div>
             <div className={showCalendly ? "block w-full bg-card rounded-[2rem] shadow-2xl border-2 border-teal/20 p-6 md:p-8" : "hidden"}>
               <CalendlyEmbed
+                url={calendlyUrl}
                 prefill={{
                   name: "",
                   email: "",
@@ -2084,12 +2087,14 @@ export type Prefill = {
 };
 
 export function CalendlyEmbed({
+  url,
   prefill,
   onBack,
   onScheduled,
   title,
   subtitle,
 }: {
+  url: string;
   prefill: Prefill;
   onBack: () => void;
   onScheduled: () => void;
@@ -2153,7 +2158,7 @@ export function CalendlyEmbed({
     ...(attribution.utm_term ? { utm_term: attribution.utm_term } : {}),
   });
 
-  const url = `${CALENDLY_URL}?${params.toString()}`;
+  const finalUrl = `${url}?${params.toString()}`;
 
   useEffect(() => {
     let cancelled = false;
@@ -2164,7 +2169,7 @@ export function CalendlyEmbed({
         .Calendly;
       if (host && C) {
         host.innerHTML = "";
-        C.initInlineWidget({ url, parentElement: host });
+        C.initInlineWidget({ url: finalUrl, parentElement: host });
       } else {
         setTimeout(tryInit, 200);
       }
@@ -2560,9 +2565,14 @@ function Index() {
     captureAttribution();
   }, []);
   const [contactOpen, setContactOpen] = useState(false);
+  const [calendlyUrl, setCalendlyUrl] = useState("");
   const scrollToBook = () => {
     const el = document.getElementById("book");
     if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
+
+  const handleShowCalendly = (url: string) => {
+    setCalendlyUrl(url);
   };
 
   // Add the telephone to structured data only in the browser, so it is not in

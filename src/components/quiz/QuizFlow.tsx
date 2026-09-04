@@ -47,7 +47,7 @@ const QUIZ_DATA = {
 
 interface QuizFlowProps {
   onComplete: (data: QuizState) => Promise<void>;
-  onShowCalendly: (data: QuizState) => void;
+  onShowCalendly: (data: QuizState, calendlyUrl?: string) => void;
   calendlyCompleted: boolean;
 }
 
@@ -98,10 +98,12 @@ export function QuizFlow({ onComplete, onShowCalendly, calendlyCompleted }: Quiz
   };
 
   const handleOptionSelect = (key: keyof QuizState, value: string) => {
-    updateState(key, value);
+    const newState = { ...state, [key]: value };
+    setState(newState);
+    
     setTimeout(() => {
-      if (key === "timeline") {
-        onShowCalendly({ ...state, timeline: value });
+      if (currentStep === 3) {
+        onShowCalendly(newState, quizData.calendly_url);
       } else {
         handleNext();
       }

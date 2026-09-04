@@ -145,15 +145,78 @@ export function AdminPanel() {
         <div>No quiz data found. Please ensure you ran the SQL setup script in Supabase!</div>
       ) : (
         <div className="space-y-12">
-          {Object.entries(quizData).map(([qKey, question]: [string, any]) => (
+          {/* Global Settings */}
+          <div className="border p-6 rounded-lg bg-muted/20">
+            <h2 className="text-2xl font-bold mb-4 text-navy">Global Settings</h2>
+            <div className="max-w-2xl">
+              <Label className="text-base font-semibold">Calendly Booking URL</Label>
+              <p className="text-sm text-muted-foreground mb-2">The link that opens at the end of the quiz.</p>
+              <div className="flex gap-2">
+                <Input 
+                  value={quizData.calendly_url || ""} 
+                  onChange={(e) => {
+                    setQuizData({ ...quizData, calendly_url: e.target.value });
+                  }} 
+                  placeholder="https://calendly.com/your-name/event" 
+                />
+                <Button onClick={() => saveQuizData(quizData)}>Save Link</Button>
+              </div>
+            </div>
+          </div>
+
+          {/* Quiz Questions */}
+          {Object.entries(quizData).map(([qKey, question]: [string, any]) => {
+            if (qKey === "calendly_url") return null; // Skip non-question keys
+            return (
             <div key={qKey} className="border p-6 rounded-lg bg-muted/20">
-              <h2 className="text-xl font-bold mb-2">{question.title}</h2>
-              <p className="text-muted-foreground mb-4">{question.description}</p>
+              <div className="mb-6 bg-background p-4 rounded-lg border shadow-sm">
+                <h3 className="text-lg font-bold mb-4 text-navy">Edit Question: {qKey}</h3>
+                <div className="space-y-4 max-w-2xl">
+                  <div>
+                    <Label>Question Title</Label>
+                    <Input 
+                      value={question.title} 
+                      onChange={(e) => {
+                        const newData = { ...quizData };
+                        newData[qKey].title = e.target.value;
+                        setQuizData(newData);
+                      }}
+                    />
+                  </div>
+                  <div>
+                    <Label>Description (optional)</Label>
+                    <Input 
+                      value={question.description} 
+                      onChange={(e) => {
+                        const newData = { ...quizData };
+                        newData[qKey].description = e.target.value;
+                        setQuizData(newData);
+                      }}
+                    />
+                  </div>
+                  <Button onClick={() => saveQuizData(quizData)}>Save Question Text</Button>
+                </div>
+              </div>
               
+              <h4 className="font-semibold mb-3">Options</h4>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {question.options.map((opt: any, index: number) => (
-                  <div key={opt.id} className="p-4 border rounded bg-background flex flex-col items-center">
-                    <h3 className="font-semibold mb-2">{opt.label}</h3>
+                {question.options?.map((opt: any, index: number) => (
+                  <div key={opt.id} className="p-4 border rounded bg-background flex flex-col">
+                    <div className="mb-4">
+                      <Label>Option Label</Label>
+                      <div className="flex gap-2 mt-1">
+                        <Input 
+                          value={opt.label} 
+                          onChange={(e) => {
+                            const newData = { ...quizData };
+                            newData[qKey].options[index].label = e.target.value;
+                            setQuizData(newData);
+                          }}
+                        />
+                        <Button variant="outline" onClick={() => saveQuizData(quizData)}>Save</Button>
+                      </div>
+                    </div>
+
                     {opt.image ? (
                       <img src={opt.image} alt={opt.label} className="w-full h-32 object-cover mb-4 rounded" />
                     ) : (
@@ -161,7 +224,8 @@ export function AdminPanel() {
                         No image
                       </div>
                     )}
-                    <div className="w-full relative">
+                    <div className="w-full relative mt-auto">
+                      <Label className="mb-1 block text-xs">Upload New Image</Label>
                       <Input 
                         type="file" 
                         accept="image/*"
@@ -176,7 +240,7 @@ export function AdminPanel() {
                 ))}
               </div>
             </div>
-          ))}
+          )})}
         </div>
       )}
     </div>
