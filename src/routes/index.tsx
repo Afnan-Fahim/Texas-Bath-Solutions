@@ -1923,6 +1923,7 @@ function BookingForm({ formRef }: { formRef: React.RefObject<HTMLElement | null>
   const [calendlyCompleted, setCalendlyCompleted] = useState(false);
   const [showCalendly, setShowCalendly] = useState(false);
   const [quizData, setQuizData] = useState<QuizState | null>(null);
+  const [isQuizOpen, setIsQuizOpen] = useState(false);
 
   useEffect(() => {
     captureAttribution();
@@ -1936,7 +1937,6 @@ function BookingForm({ formRef }: { formRef: React.RefObject<HTMLElement | null>
   const handleCalendlyScheduled = () => {
     setCalendlyCompleted(true);
     setShowCalendly(false);
-    requestAnimationFrame(() => formRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }));
   };
 
   const handleCalendlyBack = () => {
@@ -1965,12 +1965,11 @@ function BookingForm({ formRef }: { formRef: React.RefObject<HTMLElement | null>
       trackLeadEvent(`quiz:${finalData.phone}`, { phone: finalData.phone });
 
       alert("Thank you! Your visit is confirmed.");
+      setIsQuizOpen(false);
       const mw = (window as any).MessengerExtensions;
       if (mw) {
         mw.requestCloseBrowser(
-          function success() {
-            // Closed webview successfully
-          },
+          function success() {},
           function error(err: any) {
             window.location.reload();
           }
@@ -2020,29 +2019,50 @@ function BookingForm({ formRef }: { formRef: React.RefObject<HTMLElement | null>
           </ul>
         </div>
         <div className="lg:col-span-3">
-          <div className={showCalendly ? "hidden" : "block w-full"}>
-            <QuizFlow
-              onShowCalendly={handleShowCalendly}
-              onComplete={handleQuizComplete}
-              calendlyCompleted={calendlyCompleted}
-            />
-          </div>
-          <div className={showCalendly ? "block w-full bg-card rounded-3xl shadow-elegant border border-border p-6 md:p-8" : "hidden"}>
-            <CalendlyEmbed
-              prefill={{
-                name: "",
-                email: "",
-                phone: quizData?.phone || "",
-                project: quizData?.timeline || "",
-              }}
-              onBack={handleCalendlyBack}
-              onScheduled={handleCalendlyScheduled}
-              title="Pick a time for your free estimate"
-              subtitle="Lock in your appointment to discuss your project."
-            />
+          <div className="rounded-3xl bg-card border border-border shadow-elegant p-8 md:p-12 text-center flex flex-col items-center justify-center h-full min-h-[400px]">
+            <div className="grid h-20 w-20 place-items-center rounded-full bg-teal/10 text-teal mb-6">
+              <ClipboardCheck className="h-10 w-10" />
+            </div>
+            <h3 className="text-2xl md:text-3xl font-bold text-navy mb-4">Get Your Free Quote Instantly</h3>
+            <p className="text-muted-foreground mb-8 text-lg max-w-md">Answer 3 quick questions about your project to instantly lock in your appointment time.</p>
+            <Button 
+              onClick={() => setIsQuizOpen(true)}
+              size="lg" 
+              className="w-full sm:w-auto h-14 px-8 text-lg bg-navy hover:bg-navy/90 text-white shadow-xl hover:shadow-2xl transition-all hover:scale-105"
+            >
+              Start My Quote Quiz
+            </Button>
           </div>
         </div>
       </div>
+
+      <Dialog open={isQuizOpen} onOpenChange={setIsQuizOpen}>
+        <DialogContent className="max-w-4xl p-0 overflow-hidden bg-transparent border-none shadow-none [&>button]:text-white [&>button]:bg-navy/50 [&>button]:hover:bg-navy/80 [&>button]:rounded-full [&>button]:p-2 [&>button]:w-10 [&>button]:h-10 [&>button]:-top-4 [&>button]:-right-4 sm:[&>button]:-right-12">
+          <div className="max-h-[85vh] overflow-y-auto rounded-[2rem] hide-scrollbar w-full relative">
+            <div className={showCalendly ? "hidden" : "block w-full"}>
+              <QuizFlow
+                onShowCalendly={handleShowCalendly}
+                onComplete={handleQuizComplete}
+                calendlyCompleted={calendlyCompleted}
+              />
+            </div>
+            <div className={showCalendly ? "block w-full bg-card rounded-[2rem] shadow-2xl border-2 border-teal/20 p-6 md:p-8" : "hidden"}>
+              <CalendlyEmbed
+                prefill={{
+                  name: "",
+                  email: "",
+                  phone: quizData?.phone || "",
+                  project: quizData?.timeline || "",
+                }}
+                onBack={handleCalendlyBack}
+                onScheduled={handleCalendlyScheduled}
+                title="Pick a time for your free estimate"
+                subtitle="Lock in your appointment to discuss your project."
+              />
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </section>
   );
 }
@@ -2382,7 +2402,11 @@ function Footer() {
       <div className="border-t border-neutral-900/10">
         <div className="container-x py-5 flex flex-wrap items-center justify-between gap-3 text-xs text-neutral-600">
           <div>© {new Date().getFullYear()} Texas Bath Solutions. All rights reserved.</div>
-          <div className="text-neutral-600">Licensed &amp; Insured · San Antonio, Texas</div>
+          <div className="flex items-center gap-3 text-neutral-600">
+            <span>Licensed &amp; Insured · San Antonio, Texas</span>
+            <span>·</span>
+            <a href="/admin" className="hover:text-navy hover:underline transition-colors">Admin Panel</a>
+          </div>
         </div>
       </div>
       <LegalTerms />

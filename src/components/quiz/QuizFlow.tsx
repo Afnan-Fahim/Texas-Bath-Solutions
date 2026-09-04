@@ -165,7 +165,7 @@ export function QuizFlow({ onComplete, onShowCalendly, calendlyCompleted }: Quiz
       {/* QUESTION 1 */}
       {currentStep === 1 && (
         <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-          <div className="text-center mb-8">
+          <div className="text-center mb-4 sm:mb-5">
             <h2 className="text-2xl sm:text-3xl font-bold text-foreground mb-2">{quizData.question1.title}</h2>
             <p className="text-muted-foreground">{quizData.question1.description}</p>
           </div>
@@ -186,7 +186,7 @@ export function QuizFlow({ onComplete, onShowCalendly, calendlyCompleted }: Quiz
       {/* QUESTION 2 */}
       {currentStep === 2 && (
         <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-          <div className="text-center mb-8">
+          <div className="text-center mb-4 sm:mb-5">
             <h2 className="text-2xl sm:text-3xl font-bold text-foreground mb-2">{quizData.question2.title}</h2>
             <p className="text-muted-foreground">{quizData.question2.description}</p>
           </div>
@@ -207,7 +207,7 @@ export function QuizFlow({ onComplete, onShowCalendly, calendlyCompleted }: Quiz
       {/* QUESTION 3 */}
       {currentStep === 3 && (
         <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-          <div className="text-center mb-8">
+          <div className="text-center mb-4 sm:mb-5">
             <h2 className="text-2xl sm:text-3xl font-bold text-foreground mb-2">{quizData.question3.title}</h2>
             <p className="text-muted-foreground">{quizData.question3.description}</p>
           </div>
