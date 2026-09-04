@@ -2032,7 +2032,7 @@ function BookingForm({ formRef }: { formRef: React.RefObject<HTMLElement | null>
             <Button 
               onClick={() => setIsQuizOpen(true)}
               size="lg" 
-              className="relative z-10 w-full sm:w-auto h-16 px-10 text-xl font-semibold bg-teal hover:bg-teal/90 text-white shadow-xl hover:shadow-2xl transition-all hover:-translate-y-1 animate-[bounce_3s_infinite]"
+              className="relative z-10 w-full sm:w-auto h-16 px-10 text-xl font-semibold bg-teal hover:bg-teal/90 text-white shadow-xl hover:shadow-2xl transition-all animate-bounce mt-4"
             >
               Start My Quote Quiz
             </Button>
