@@ -14,16 +14,16 @@ export function QuizCard({ title, description, image, selected, onClick }: QuizC
     <div
       onClick={onClick}
       className={cn(
-        "cursor-pointer rounded-xl border-2 overflow-hidden transition-all duration-200",
+        "cursor-pointer rounded-xl border-2 overflow-hidden transition-all duration-300",
         "flex flex-col items-center text-center",
-        "hover:border-primary/50 hover:shadow-md",
+        "hover:border-primary/50 hover:shadow-md active:scale-90 active:rotate-1",
         selected
-          ? "border-primary bg-primary/5 shadow-lg scale-[1.02]"
+          ? "border-primary bg-primary/5 shadow-lg scale-105"
           : "border-border bg-card"
       )}
     >
       {image ? (
-        <div className="w-full aspect-video sm:aspect-[4/3] bg-muted/30 relative overflow-hidden flex items-center justify-center p-2">
+        <div className="w-full aspect-video sm:aspect-[4/3] bg-muted/30 relative overflow-hidden flex items-center justify-center p-2 group">
           {/* Premium blurred background effect */}
           <div 
             className="absolute inset-0 blur-2xl opacity-50 bg-cover bg-center scale-110" 
@@ -32,7 +32,7 @@ export function QuizCard({ title, description, image, selected, onClick }: QuizC
           <img
             src={image}
             alt={title}
-            className="relative w-full h-full object-contain rounded-md drop-shadow-md z-10"
+            className="relative w-full h-full object-contain rounded-md drop-shadow-md z-10 animate-[bounce_2s_infinite] group-hover:animate-none group-hover:scale-110 transition-transform duration-300"
             loading="lazy"
             onError={(e) => {
               // Fallback if image fails to load

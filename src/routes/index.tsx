@@ -2021,38 +2021,17 @@ function BookingForm({ formRef }: { formRef: React.RefObject<HTMLElement | null>
           </ul>
         </div>
         <div className="lg:col-span-3">
-          <div className="rounded-3xl bg-card border border-teal/20 shadow-2xl p-8 md:p-12 text-center flex flex-col items-center justify-center h-full min-h-[400px] relative overflow-hidden group hover:shadow-[0_10px_50px_rgba(13,59,102,0.12)] transition-all duration-500">
-            {/* Background Glows */}
-            <div className="absolute top-0 right-0 -mr-20 -mt-20 w-64 h-64 rounded-full bg-teal/10 blur-3xl opacity-50 pointer-events-none group-hover:opacity-100 transition-opacity duration-700"></div>
-            <div className="absolute bottom-0 left-0 -ml-20 -mb-20 w-64 h-64 rounded-full bg-navy/5 blur-3xl opacity-50 pointer-events-none group-hover:opacity-100 transition-opacity duration-700"></div>
-            
-            <div className="relative z-10 grid h-24 w-24 place-items-center rounded-full bg-teal/10 text-teal mb-6 animate-pulse">
-              <ClipboardCheck className="h-12 w-12" />
-            </div>
-            <h3 className="relative z-10 text-3xl md:text-4xl font-bold text-navy mb-4 leading-tight">Get Your Free Quote Instantly</h3>
-            <p className="relative z-10 text-muted-foreground mb-8 text-lg max-w-md">Answer 3 quick questions about your project to instantly lock in your appointment time.</p>
-            <Button 
-              onClick={() => setIsQuizOpen(true)}
-              size="lg" 
-              className="relative z-10 w-full sm:w-auto h-16 px-10 text-xl font-semibold bg-teal hover:bg-teal/90 text-white shadow-xl hover:shadow-2xl transition-all animate-bounce mt-4"
-            >
-              Start My Quote Quiz
-            </Button>
-          </div>
-        </div>
-      </div>
-
-      <Dialog open={isQuizOpen} onOpenChange={setIsQuizOpen}>
-        <DialogContent className="max-w-4xl p-0 overflow-hidden bg-transparent border-none shadow-none [&>button]:text-white [&>button]:bg-navy/50 [&>button]:hover:bg-navy/80 [&>button]:rounded-full [&>button]:p-2 [&>button]:w-10 [&>button]:h-10 [&>button]:-top-4 [&>button]:-right-4 sm:[&>button]:-right-12">
-          <div className="max-h-[85vh] overflow-y-auto rounded-[2rem] hide-scrollbar w-full relative">
+          <div className="w-full max-h-[85vh] overflow-y-auto rounded-3xl hide-scrollbar relative bg-card shadow-2xl border border-teal/20">
             <div className={showCalendly ? "hidden" : "block w-full"}>
               <QuizFlow
                 onShowCalendly={handleShowCalendly}
-                onComplete={handleQuizComplete}
+                onComplete={async (data) => {
+                  await handleQuizComplete(data);
+                }}
                 calendlyCompleted={calendlyCompleted}
               />
             </div>
-            <div className={showCalendly ? "block w-full bg-card rounded-[2rem] shadow-2xl border-2 border-teal/20 p-6 md:p-8" : "hidden"}>
+            <div className={showCalendly ? "block w-full p-6 md:p-8" : "hidden"}>
               <CalendlyEmbed
                 url={calendlyUrl}
                 prefill={{
@@ -2068,8 +2047,8 @@ function BookingForm({ formRef }: { formRef: React.RefObject<HTMLElement | null>
               />
             </div>
           </div>
-        </DialogContent>
-      </Dialog>
+        </div>
+      </div>
     </section>
   );
 }

@@ -13,9 +13,11 @@ function QuizPage() {
   const [calendlyCompleted, setCalendlyCompleted] = useState(false);
   const [showCalendly, setShowCalendly] = useState(false);
   const [quizData, setQuizData] = useState<QuizState | null>(null);
+  const [calendlyUrl, setCalendlyUrl] = useState("https://calendly.com/rugsafari/texas-bath-solutions");
 
-  const handleShowCalendly = (data: QuizState) => {
+  const handleShowCalendly = (data: QuizState, url?: string) => {
     setQuizData(data);
+    if (url) setCalendlyUrl(url);
     setShowCalendly(true);
   };
 
@@ -90,10 +92,12 @@ function QuizPage() {
 
         <div className={showCalendly ? "block w-full max-w-3xl mx-auto bg-background p-6 rounded-2xl shadow-sm border border-border" : "hidden"}>
           <CalendlyEmbed
+            url={calendlyUrl}
             prefill={{
               name: "",
               email: "",
-              phone: "",
+              phone: quizData?.phone || "",
+              project: quizData?.timeline || "",
             }}
             onBack={handleCalendlyBack}
             onScheduled={handleCalendlyScheduled}
