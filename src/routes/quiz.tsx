@@ -51,7 +51,19 @@ function QuizPage() {
       trackLeadEvent(`quiz:${finalData.phone}`, { phone: finalData.phone });
 
       alert("Thank you! Your visit is confirmed.");
-      window.location.href = "/";
+      const mw = (window as any).MessengerExtensions;
+      if (mw) {
+        mw.requestCloseBrowser(
+          function success() {
+            // Closed webview successfully
+          },
+          function error(err: any) {
+            window.location.href = "/";
+          }
+        );
+      } else {
+        window.location.href = "/";
+      }
     } catch (e) {
       console.error(e);
       alert("Failed to submit. Please try again.");

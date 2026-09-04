@@ -129,8 +129,23 @@ export function QuizFlow({ onComplete, onShowCalendly, calendlyCompleted }: Quiz
   }
 
   return (
-    <div className="w-full max-w-2xl mx-auto p-4 sm:p-6 bg-card rounded-2xl shadow-sm border border-border">
-      {/* Progress */}
+    <div className="w-full max-w-2xl mx-auto bg-card rounded-[2rem] shadow-2xl border border-teal/20 relative overflow-hidden transition-all duration-500 group hover:shadow-[0_10px_50px_rgba(13,59,102,0.12)]">
+      
+      {/* Decorative gradient backgrounds */}
+      <div className="absolute top-0 right-0 -mr-20 -mt-20 w-64 h-64 rounded-full bg-teal/10 blur-3xl opacity-50 pointer-events-none group-hover:opacity-100 transition-opacity duration-700"></div>
+      <div className="absolute bottom-0 left-0 -ml-20 -mb-20 w-64 h-64 rounded-full bg-navy/5 blur-3xl opacity-50 pointer-events-none group-hover:opacity-100 transition-opacity duration-700"></div>
+      
+      {/* "Start Here" Attention Grabber for the first step */}
+      {currentStep === 1 && (
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 mt-4 z-20">
+          <span className="flex h-8 items-center justify-center rounded-full bg-teal px-4 text-xs font-bold uppercase tracking-wider text-white shadow-md animate-bounce">
+            Start Here
+          </span>
+        </div>
+      )}
+
+      <div className="relative z-10 p-5 sm:p-8 md:p-10">
+        {/* Progress */}
       {currentStep <= 3 && (
         <div className="mb-6 flex items-center justify-between">
           <button
@@ -288,6 +303,7 @@ export function QuizFlow({ onComplete, onShowCalendly, calendlyCompleted }: Quiz
           </form>
         </div>
       )}
+      </div>
     </div>
   );
 }

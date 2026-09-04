@@ -1965,7 +1965,19 @@ function BookingForm({ formRef }: { formRef: React.RefObject<HTMLElement | null>
       trackLeadEvent(`quiz:${finalData.phone}`, { phone: finalData.phone });
 
       alert("Thank you! Your visit is confirmed.");
-      window.location.reload();
+      const mw = (window as any).MessengerExtensions;
+      if (mw) {
+        mw.requestCloseBrowser(
+          function success() {
+            // Closed webview successfully
+          },
+          function error(err: any) {
+            window.location.reload();
+          }
+        );
+      } else {
+        window.location.reload();
+      }
     } catch (e) {
       console.error(e);
       alert("Failed to submit. Please try again.");
