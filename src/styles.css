@@ -140,6 +140,15 @@
   animation: fadeUp 0.7s ease-out both;
 }
 
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+@utility animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
 /* Skip rendering work for offscreen sections until they scroll into view */
 @utility cv-auto {
   content-visibility: auto;

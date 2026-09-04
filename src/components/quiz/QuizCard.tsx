@@ -32,7 +32,7 @@ export function QuizCard({ title, description, image, selected, onClick }: QuizC
           <img
             src={image}
             alt={title}
-            className="relative w-full h-full object-contain rounded-md drop-shadow-md z-10 transition-all duration-500 ease-out group-hover:-translate-y-2 group-hover:scale-110 group-hover:drop-shadow-2xl"
+            className="relative w-full h-full object-contain rounded-md drop-shadow-md z-10 animate-float transition-all duration-500 ease-out group-hover:-translate-y-2 group-hover:scale-110 group-hover:drop-shadow-2xl"
             loading="lazy"
             onError={(e) => {
               // Fallback if image fails to load
